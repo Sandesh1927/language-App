@@ -4,23 +4,8 @@ import base64
 import streamlit as st
 from gtts import gTTS
 from langdetect import detect, LangDetectException
-from deep_translator import GoogleTranslator, single_detection
+from deep_translator import GoogleTranslator
 import pycountry
-from wordcloud import WordCloud
-import matplotlib.pyplot as plt
-from nltk.tokenize import word_tokenize
-from nltk.corpus import stopwords
-import nltk
-
-# ---------- Ensure NLTK resources ----------
-def ensure_nltk_resource(name, package=None):
-    try:
-        nltk.data.find(name)
-    except LookupError:
-        nltk.download(package or name.split('/')[-1], quiet=True)
-
-ensure_nltk_resource('tokenizers/punkt', 'punkt')
-ensure_nltk_resource('corpora/stopwords', 'stopwords')
 
 # ---------- Helpers ----------
 def get_language_name(code):
@@ -63,23 +48,6 @@ def read_aloud_streamlit(text, lang="en"):
         st.audio(mp3_fp, format="audio/mp3")
     except Exception as e:
         st.warning(f"Audio generation failed for lang='{lang}': {e}")
-
-def generate_wordcloud_figure(text):
-    tokens = word_tokenize(text.lower())
-    try:
-        stop_words = set(stopwords.words("english"))
-    except LookupError:
-        stop_words = set()
-    filtered = [w for w in tokens if w.isalpha() and w not in stop_words]
-    if not filtered:
-        raise ValueError("No valid words to build a word cloud after filtering.")
-    wc_text = " ".join(filtered)
-    wc = WordCloud(width=800, height=400, background_color="white").generate(wc_text)
-    fig = plt.figure(figsize=(10, 5))
-    plt.imshow(wc, interpolation="bilinear")
-    plt.axis("off")
-    plt.tight_layout()
-    return fig
 
 def normalize_gtts_code(code):
     if not code:
@@ -136,26 +104,10 @@ with col1:
         else:
             st.info("Type or paste a paragraph first.")
 
-    if st.button("Generate Word Cloud"):
-        if paragraph.strip():
-            text_for_cloud = paragraph
-            try:
-                translated = GoogleTranslator(source='auto', target='en').translate(paragraph)
-                text_for_cloud = translated
-            except:
-                pass
-            try:
-                fig = generate_wordcloud_figure(text_for_cloud)
-                st.pyplot(fig)
-            except Exception as e:
-                st.error(f"Could not generate word cloud: {e}")
-        else:
-            st.info("Type or paste a paragraph first.")
-
 with col2:
     st.subheader("Translate & read aloud")
 
-    # Build a language dict from deep-translator supported languages
+    # Languages supported by deep-translator
     deep_languages = {
         'ar':'Arabic','bn':'Bengali','cs':'Czech','da':'Danish','de':'German',
         'en':'English','es':'Spanish','fr':'French','hi':'Hindi','it':'Italian',
