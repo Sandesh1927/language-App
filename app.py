@@ -20,6 +20,7 @@ def get_language_name(code):
     return code
 
 def add_bg_from_local(image_file):
+    """Set a background image for the app."""
     try:
         with open(image_file, "rb") as f:
             data = f.read()
@@ -71,10 +72,14 @@ def spell_text_audio_bytes(word, lang="en"):
     return mp3_fp
 
 # ---------- Page layout ----------
-st.set_page_config(page_title="Globalize", layout="wide")
+st.set_page_config(
+    page_title="MyTranslatorApp",    # <-- Custom app name
+    page_icon="🌎",                   # <-- Emoji icon or use "icon.png"
+    layout="wide"
+)
 add_bg_from_local("back.jpg")
 
-st.title("Globalize — small multilingual helper")
+st.title("MyTranslatorApp — multilingual helper")
 
 col1, col2 = st.columns([2, 1])
 
@@ -107,7 +112,6 @@ with col1:
 with col2:
     st.subheader("Translate & read aloud")
 
-    # Languages supported by deep-translator
     deep_languages = {
         'ar':'Arabic','bn':'Bengali','cs':'Czech','da':'Danish','de':'German',
         'en':'English','es':'Spanish','fr':'French','hi':'Hindi','it':'Italian',
